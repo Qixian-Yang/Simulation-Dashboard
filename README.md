@@ -50,8 +50,9 @@ Frame：
 ## Dashboard:
 dashboard is developed by python 3.7.8, it can present the data in the form of graphs and provide some analysis of the data.
 it have static and reply model, and support to export image or pdf file.
+It has a sample csv files for running, so you can just run main.py and click start by local to start.
 
-## requirement package:
+## requirement package for dashboard:
 wxpython
 pyodbc
 azure
