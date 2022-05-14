@@ -164,11 +164,14 @@ class Dashboard(wx.Frame):
         
 
         self.vb = wx.BoxSizer(wx.VERTICAL)
-        a = risk.risk().risk_analyse(sensorID_dict)
+        risklist = risk.risk().risk_analyse(sensorID_dict)
         label = ""
-        for i in a:
+        for i in risklist:
             label+=i.tostring()+"\n"
-        self.word = wx.StaticText(parent=self.panel, id=10, label=a[0].tostring())
+        if(len(risklist)>0):
+            self.word = wx.StaticText(parent=self.panel, id=10, label=risklist[0].tostring())
+        else:
+            self.word = wx.StaticText(parent=self.panel, id=10, label="")
         
 
         self.vb.Add(self.temgrid, 0)
@@ -219,52 +222,63 @@ class Dashboard(wx.Frame):
         #self.plotter2.Draw(gc2)
         #self.plotter3.Draw(gc3)
 
-        sensor1count = 0
-        sensor1level = ""
-        for i in a:
-            print(i.tostring())
-            print(sensor1level)
-            if i.place!="1":
-                continue
-            elif i.risklevel=="red":
-                sensor1level="red"
-                sensor1count+=1
-            elif i.risklevel=="yellow" and sensor1level!="red":
-                sensor1level="yellow"
-                sensor1count+=1
-            elif sensor1level=="":
-                sensor1level="blue"
-                sensor1count+=1
-            print(sensor1level)
-            print("\n")
-        rev1 = wx.TextCtrl(self.panel, -1, "Motor OT",(325, 725),(140,36))
-        Font = rev1.GetFont()
-        Font.PointSize=20
-        rev1.SetFont(Font)
-        if(sensor1level=="red"):
-            rev1.SetForegroundColour('white')
-            rev1.SetBackgroundColour('red')
-        elif(sensor1level=="yellow"):
-            rev1.SetForegroundColour('black')
-            rev1.SetBackgroundColour('yellow')
-        rev1.SetModified(True)
-        rev2 = wx.StaticText(self.panel, -1, "Badly worn in driving wheels",(360, 345))
-        Font2 = rev2.GetFont()
-        Font2.PointSize=20
-        rev2.SetFont(Font)
-        rev2.SetForegroundColour('black')
-        rev2.SetBackgroundColour('yellow')
-        rev3 = wx.StaticText(self.panel, -1, "No risk",(680, 400))
-        Font3 = rev3.GetFont()
-        Font3.PointSize=20
-        rev3.SetFont(Font)
-
+        self.sensor_risk_button("1",risklist)
+        self.sensor_risk_button("2",risklist)
+        self.sensor_risk_button("3",risklist)
 
         self.panel.SetSizer(self.nmbox)
         self.Show()
         toastone = wx.MessageDialog(None, "The machine is seriously out of order and may break down at any time."+"\n"+"Please check the Risk module for more details",caption="Danger risk",style = wx.ICON_WARNING)
         if(toastone.ShowModal() == wx.ID_YES): 
             toastone.Destroy() 
+
+    #func for sensor risk information button
+    def sensor_risk_button(self,sensorid,a):
+        sensorcount = 0
+        sensorlevel = ""
+        sensorriskname="No risk"
+        for i in a:
+            print(i.tostring())
+            print(sensorlevel)
+            if i.place!=sensorid:
+                continue
+            elif i.risklevel=="red":
+                sensorlevel="red"
+                sensorcount+=1
+                sensorriskname = i.riskname
+            elif i.risklevel=="yellow" and sensorlevel!="red":
+                sensorlevel="yellow"
+                sensorcount+=1
+                sensorriskname = i.riskname
+            elif sensorlevel=="":
+                sensorlevel="blue"
+                sensorcount+=1
+                sensorriskname = i.riskname
+            print(sensorlevel)
+            print("\n")
+        if(sensorid=="1"):
+            rev = wx.TextCtrl(self.panel, -1, sensorriskname,(325, 725),(140,36))
+        elif(sensorid=="2"):
+            rev = wx.StaticText(self.panel, -1, "Badly worn in driving wheels",(360, 345))
+        else:
+            rev = wx.StaticText(self.panel, -1, "No risk",(680, 400))
+        Font = rev.GetFont()
+        Font.PointSize=20
+        rev.SetFont(Font)
+        if(sensorlevel=="red"):
+            rev.SetForegroundColour('white')
+            rev.SetBackgroundColour('red')
+        elif(sensorlevel=="yellow"):
+            rev.SetForegroundColour('black')
+            rev.SetBackgroundColour('yellow')
+        elif(sensorlevel=="blue"):
+            rev.SetForegroundColour('white')
+            rev.SetBackgroundColour('blue')
+        else:
+            rev.SetForegroundColour('black')
+            rev.SetBackgroundColour('white')
+        #rev.SetModified(True)
+
 
     #get each line for sensor
     def get_lines(self,time = 10000):

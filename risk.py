@@ -24,13 +24,13 @@ class risk:
     def __init__(self,risklevel="",place="",riskname="",influence="",description="",solution=""):
         self.risklevel = risklevel
         self.place=place
-        self.riskname=influence
+        self.riskname=riskname
         self.description=solution
         self.influence=influence
         self.solution=solution
 
     def tostring(self):
-        return("Risklevel:"+self.risklevel+"\n"+"Place:"+self.place+"\n"+" riskname:"+self.riskname+"\n"+"Description:"+self.description+"\n"+"Influence:"+self.influence+"\n"+"Solution:"+self.solution+"\n"+"Time:"+self.time)
+        return("Risklevel:"+self.risklevel+"\n"+"Place:"+self.place+"\n"+"Riskname:"+self.riskname+"\n"+"Description:"+self.description+"\n"+"Influence:"+self.influence+"\n"+"Solution:"+self.solution+"\n"+"Time:"+self.time)
 
 
     def __str__(self):
@@ -38,14 +38,12 @@ class risk:
 
     @staticmethod
     def get_innormaldata(fulldata=""):
-        print("******get_innormaldata*******")
+        print("***********************Get_innormaldata***********************")
         global s1x,s1y,s1z,s1t,s2x,s2y,s2z,s2t,s3x,s3y,s3z,s3t
         li=[]
         for i in fulldata:
             for j in fulldata[i]:
-                print(j)
                 if j.sensorID=="1":
-                    print(j.temperature)
                     if float(j.vibrationx)>=s1x:
                         li.append([j,11])
                     if float(j.vibrationy)>=s1y:
@@ -55,7 +53,6 @@ class risk:
                     if float(j.temperature)>=s1t:
                         li.append([j,14])
                 if j.sensorID=="2":
-                    print(j.temperature)
                     if float(j.vibrationx)>=s2x:
                         li.append([j,21])
                     if float(j.vibrationy)>=s2y:
@@ -65,7 +62,6 @@ class risk:
                     if float(j.temperature)>=s2t:
                         li.append([j,24])
                 if j.sensorID=="3":
-                    print(j.temperature)
                     if float(j.vibrationx)>=s3x:
                         li.append([j,31])
                     if float(j.vibrationy)>=s3y:
@@ -74,13 +70,13 @@ class risk:
                         li.append([j,33])
                     if float(j.temperature)>=s3t:
                         li.append([j,34])
+        print("List print")
         for i in li:
             print(i[0])
         return li
 
     @staticmethod
     def belt_wear(li=""):
-
         return False
 
     @staticmethod
@@ -117,15 +113,16 @@ class risk:
         for i in li:
             if(i[1]==14):
                 count+=1
+        print("overload:"+str(count))
         return count
 
     @staticmethod
     def unstable_track(li=""):
-        return True
+        return False
 
     @staticmethod
     def cargo_fixed_loose(li=""):
-        return True
+        return False
 
     @staticmethod
     def risk_analyse(fulldata=""):
@@ -135,7 +132,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="blue",
                 place="2",
-                riskname="belt wear",
+                riskname="Belt wear",
                 influence="Won't cause serious result",
                 description="The belt will broke, but it can still work a few days",
                 solution="Change the belt later, just focus on it now"))
@@ -143,7 +140,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="red",
                 place="2",
-                riskname="belt fall off",
+                riskname="Belt fall off",
                 influence="Machine is under danger state",
                 description="The belt has been fall off, machine should be stopped immediately!",
                 solution="Machine need to be stopped to fix"))
@@ -151,7 +148,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="yellow",
                 place="2",
-                riskname="belt too loose",
+                riskname="Belt too loose",
                 influence="This risk will be danger soon",
                 description="Belt is too loose, and need to be fixed",
                 solution="Fix it but this risk is not so hurry"))
@@ -159,7 +156,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="blue",
                 place="2",
-                riskname="belt too tight",
+                riskname="Belt too tight",
                 influence="Won't cause serious result",
                 description="The belt is too tight",
                 solution="Adjust the belt again, but not so hurry"))
@@ -167,7 +164,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="blue",
                 place="Sensor2",
-                riskname="wheel wear",
+                riskname="Wheel wear",
                 influence="Won't cause serious result",
                 description="The wheel will broke, but it can still work a few days",
                 solution="Change the belt later, just focus on it now"))
@@ -175,7 +172,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="blue",
                 place="1",
-                riskname="drive shaft wear",
+                riskname="Drive shaft wear",
                 influence="Won't cause serious result",
                 description="The drive shaft will broke, but it can still work a few days",
                 solution="Change the drive shaft later, just focus on it now"))
@@ -183,7 +180,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="yellow",
                 place="1",
-                riskname="wheel fixed loose",
+                riskname="Wheel fixed loose",
                 influence="This risk will be danger soon",
                 description="Wheel is too loose, and need to be fixed",
                 solution="Fix it but this risk is not so hurry"))
@@ -191,7 +188,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="red",
                 place="1",
-                riskname="wheel moving",
+                riskname="Wheel moving",
                 influence="Machine is under danger state",
                 description="The wheel has been moving too much, machine should be stopped immediately!",
                 solution="Machine need to be stopped to fix"))
@@ -200,24 +197,24 @@ class risk:
             if(c<3):
                 returnrisk.append(risk(
                     risklevel="blue",
-                    place="13",
-                    riskname="overload",
+                    place="1",
+                    riskname="Overload",
                     influence="Won't cause serious result",
                     description="Just overload, focus on the mechine and make sure it won't too hot",
                     solution="Just overload, focus on the mechine and make sure it won't too hot"))
             elif(c<5):
                 returnrisk.append(risk(
                     risklevel="yellow",
-                    place="13",
-                    riskname="overload",
+                    place="1",
+                    riskname="Overload",
                     influence="Overload for a long time may cause serious damage to the machine",
                     description="Multiple overloads indicate that the machine is overused and needs to be allocated properly",
                     solution="Reduce concentrated use to prevent overheating"))
             else:
                 returnrisk.append(risk(
                     risklevel="red",
-                    place="13",
-                    riskname="overload",
+                    place="1",
+                    riskname="Motor overload",
                     influence="Frequent overloads can cause permanent damage to the motor",
                     description="Long time overload makes the motor temperature always too high, at a dangerous level",
                     solution="Suspend use and perform maintenance"))
@@ -225,7 +222,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="blue",
                 place="3",
-                riskname="unstable track",
+                riskname="Unstable track",
                 influence="Won't cause serious result",
                 description="Track should be replaced",
                 solution="Track should be changed, but it is not hurry"))
@@ -233,7 +230,7 @@ class risk:
             returnrisk.append(risk(
                 risklevel="yellow",
                 place="1",
-                riskname="cargo fixed loose",
+                riskname="Cargo fixed loose",
                 influence="This risk will be danger soon",
                 description="Cargo fixed loose, it is danger for passengers",
                 solution="Fix it but this risk is not so hurry"))
