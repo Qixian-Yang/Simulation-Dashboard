@@ -20,14 +20,16 @@ class risk:
     time=""
     description=""
     solution=""
+    sensortype=0
 
-    def __init__(self,risklevel="",place="",riskname="",influence="",description="",solution=""):
+    def __init__(self,risklevel="",place="",riskname="",influence="",description="",solution="",sensortype=0):
         self.risklevel = risklevel
         self.place=place
         self.riskname=riskname
         self.description=solution
         self.influence=influence
         self.solution=solution
+        self.sensortype=sensortype
 
     def tostring(self):
         return("Risklevel:"+self.risklevel+"\n"+"Place:"+self.place+"\n"+"Riskname:"+self.riskname+"\n"+"Description:"+self.description+"\n"+"Influence:"+self.influence+"\n"+"Solution:"+self.solution+"\n"+"Time:"+self.time)
@@ -89,7 +91,7 @@ class risk:
 
     @staticmethod
     def belt_too_tight(li=""):
-        return False
+        return True
 
     @staticmethod
     def wheel_wear(li=""):
@@ -118,7 +120,7 @@ class risk:
 
     @staticmethod
     def unstable_track(li=""):
-        return False
+        return True
 
     @staticmethod
     def cargo_fixed_loose(li=""):
@@ -151,7 +153,8 @@ class risk:
                 riskname="Belt too loose",
                 influence="This risk will be danger soon",
                 description="Belt is too loose, and need to be fixed",
-                solution="Fix it but this risk is not so hurry"))
+                solution="Fix it but this risk is not so hurry",
+                sensortype=1))
         if(risk().belt_too_tight(li)):
             returnrisk.append(risk(
                 risklevel="blue",
@@ -159,11 +162,12 @@ class risk:
                 riskname="Belt too tight",
                 influence="Won't cause serious result",
                 description="The belt is too tight",
-                solution="Adjust the belt again, but not so hurry"))
+                solution="Adjust the belt again, but not so hurry",
+                sensortype=1))
         if(risk().wheel_wear(li)):
             returnrisk.append(risk(
                 risklevel="blue",
-                place="Sensor2",
+                place="2",
                 riskname="Wheel wear",
                 influence="Won't cause serious result",
                 description="The wheel will broke, but it can still work a few days",

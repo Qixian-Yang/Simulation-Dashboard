@@ -45,17 +45,18 @@ class Dashboard(wx.Frame):
     def __init__(self,parent,dic):
         super(Dashboard, self).__init__(parent, title='text',size=(950, 840))
         self.dic = dic   
-        self.linet0=None
         self.linet1=None
         self.linet2=None
-        self.linep0=None
-        self.linep1=None
-        self.linep2=None
-        self.linev0=None
-        self.linev1=None
-        self.linev2=None
+        self.linet3=None
+        self.linevx1=None
+        self.linevx2=None
+        self.linevx3=None
+        self.linevy0=None
+        self.linevy1=None
+        self.linevy2=None
         self.get_lines()
-        self.temboxlist=[]
+        self.singleboxlist=[]
+        self.checkboxlist=[]
         self.vibrationx=[]
         self.vibrationy=[]
  
@@ -63,6 +64,7 @@ class Dashboard(wx.Frame):
  
     #draw graph and table for each page
     def draw(self):
+        
         menuBar = wx.MenuBar()
  
         menumenu = wx.Menu()
@@ -97,10 +99,8 @@ class Dashboard(wx.Frame):
         self.Bind(wx.EVT_MENU, self.menuHandler)
 
 
-
-
         self.panel = wx.Panel(self)
-        self.panel.SetBackgroundColour("white")  
+        self.panel.SetBackgroundColour("White")  
         self.plotter = plot.PlotCanvas(self.panel)
         #self.plotter2 = plot.PlotCanvas(self.panel)
         #self.plotter3 = plot.PlotCanvas(self.panel)
@@ -118,29 +118,45 @@ class Dashboard(wx.Frame):
         #self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         #self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 
+        boxtem=wx.RadioButton(self.panel,0,"temperature sensor",pos=(30,50),size=(250,20))
+        boxtem.SetValue(True)
+        self.singleboxlist.append(boxtem)
+        boxtem.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
+        self.hbox.Add(boxtem,0,wx.LEFT,border=10)
+        boxvx=wx.RadioButton(self.panel,1,"Virbration X",pos=(60,50),size=(250,20))
+        self.singleboxlist.append(boxvx)
+        boxvx.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
+        self.hbox.Add(boxvx)
+        boxvy=wx.RadioButton(self.panel,2,"Virbration Y",pos=(90,50),size=(250,20))
+        self.singleboxlist.append(boxvy)
+        boxvy.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
+        self.hbox.Add(boxvy)
+        boxvz=wx.RadioButton(self.panel,3,"Virbration Z",pos=(120,50),size=(250,20))
+        self.singleboxlist.append(boxvz)
+        boxvz.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
+        self.hbox.Add(boxvz)
+            
+
         for i in range(0,len(sensorID_dict)):
-            boxtem=wx.CheckBox(self.panel,i,"temperature sensor"+str(i),pos=(50*i,50),size=(300,15))
-            #boxpre=wx.CheckBox(self.panel,i,"pressure sensor"+str(i),pos=(50*i,50),size=(150,15))
-            #boxvib=wx.CheckBox(self.panel,i,"vibration sensor"+str(i),pos=(50*i,50),size=(150,15))
+            boxtem=wx.CheckBox(self.panel,i,"",pos=(50*i,50),size=(300,15))
+            if(i==0):
+                boxtem.SetLabel("sensor1(redline)")
+            elif(i==1):
+                boxtem.SetLabel("sensor2(blackline)")
+            elif(i==2):
+                boxtem.SetLabel("sensor3(blueline)")
 
             boxtem.SetValue(True)
-            #boxpre.SetValue(True)
-            #boxvib.SetValue(True)
             self.Bind(wx.EVT_CHECKBOX,self.checkevent)
             #self.Bind(wx.EVT_CHECKBOX,self.checkevent_pre,boxpre)
-            self.temboxlist.append(boxtem)
-            #self.preboxlist.append(boxpre)
+            self.checkboxlist.append(boxtem)
+            #self.vibrationx.append(boxpre)
             #self.vibboxlist.append(boxvib)
 
-            self.hbox.Add(boxtem,0,wx.LEFT,border=10)
+            self.hbox2.Add(boxtem,0,wx.LEFT,border=10)
             #self.hbox2.Add(boxpre,0,wx.LEFT,border=10)
             #self.hbox3.Add(boxvib,0,wx.LEFT,border=10)
 
-        for i in range(0,len(sensorID_dict)):
-            boxtem=wx.CheckBox(self.panel,i,"temperature sensor"+str(i),pos=(50*i,50),size=(300,15))
-
-            boxtem.SetValue(True)
-            self.hbox2.Add(boxtem,0,wx.LEFT,border=10)
         self.vboxleft.Add(self.hbox,0)
         self.vboxleft.Add(self.hbox2,0)
         self.vboxmid.Add(self.plotter, 0)
@@ -179,13 +195,24 @@ class Dashboard(wx.Frame):
         self.vboxmid.Add(self.vb, 0)
 
         
-        self.bmaps=wx.Bitmap('C:/Users/MSI-NB/Desktop/2.jpg',wx.BITMAP_TYPE_ANY)
-        self.image=wx.StaticBitmap(self.panel,-1,self.bmaps)
+
+        
+        self.bmaps=wx.Bitmap('C:/Users/MSI-NB/Desktop/2.png',wx.BITMAP_TYPE_ANY)
+        self.image=wx.StaticBitmap(self.panel,-1,self.bmaps,pos=(0,340))
+        self.s1button = wx.Button(self.image, label='S1',pos=(280, 385),size=(35,35))
+        self.s1button.Bind(wx.EVT_BUTTON, self.on_click_s1)
+        self.s2button = wx.Button(self.image, label='S2',pos=(315, 5),size=(35,35))
+        self.s2button.Bind(wx.EVT_BUTTON, self.on_click_s1)
+        self.s3button = wx.Button(self.image, label='S3',pos=(635, 60),size=(35,35))
+        self.s3button.Bind(wx.EVT_BUTTON, self.on_click_s1)
+        
         
 
         self.vboxleft.Add(self.vboxmid,0)
-        self.vboxleft.Add(self.image, 0)
         self.nmbox.Add(self.vboxleft, 0)
+
+
+
         #self.nmbox.Add(self.vboxright, 0)
  
         
@@ -193,10 +220,10 @@ class Dashboard(wx.Frame):
         #pre=[]
         #vib=[]
         count=0
-        t=[self.linet0,self.linet1,self.linet2]
+        t=[self.linet1,self.linet2,self.linet3]
         #p=[self.linep0,self.linep1,self.linep2]
         #v=[self.linev0,self.linev1,self.linev2]
-        for i in self.temboxlist:
+        for i in self.checkboxlist:
             if i.GetValue():
                 tem.append(t[count])
             count+=1
@@ -237,6 +264,8 @@ class Dashboard(wx.Frame):
         sensorcount = 0
         sensorlevel = ""
         sensorriskname="No risk"
+        
+
         for i in a:
             print(i.tostring())
             print(sensorlevel)
@@ -278,41 +307,119 @@ class Dashboard(wx.Frame):
             rev.SetForegroundColour('black')
             rev.SetBackgroundColour('white')
         #rev.SetModified(True)
+        
+
+       
+    def on_click_s1(self,event):
+        print("on_click_s1")
+        self.panel.DestroyChildren()
+
+        self.plotter = plot.PlotCanvas(self.panel)
+        self.plotter.SetInitialSize(size=(500, 300))
+        self.nmbox = wx.BoxSizer(wx.HORIZONTAL)
+        
+
+        tem=[self.linet1]
+        #pre=[]
+        #vib=[]
+        count=0
+        t=[self.linet1,self.linet2,self.linet3]
+        
+        gc1= plot.PlotGraphics(tem, 'Tem in risk', 'time', 'tem')
+        #gc2= plot.PlotGraphics(pre, 'Pre', 'time', 'pressure')
+        #gc3= plot.PlotGraphics(vib, 'Vib', 'time', 'vibration')
+        self.plotter.Draw(gc1)
+        
+        self.listbox = wx.ListBox(self.panel, pos=(500,0), size=(430,750), name="listBox",style=wx.LB_ALWAYS_SB)
+        
+
+        self.vb = wx.BoxSizer(wx.VERTICAL)
+        risklist = risk.risk().risk_analyse(sensorID_dict)
+        font1 = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, 'Consolas')
+        self.listbox.SetFont(font1)
+        for i in risklist:
+            self.listbox.AppendItems('''Risklevel:'''+i.risklevel+'''  Riskname:'''+i.riskname)
+
+        self.mechine_information_title = wx.StaticText(self.panel, -1, "Mechine information",(10, 310))
+        self.mechine_information = wx.TextCtrl(self.panel, -1, "",(10, 330),(470,125),wx.TE_MULTILINE|wx.TE_READONLY)
+        self.risk_information_title = wx.StaticText(self.panel, -1, "Risk information",(10, 460))
+        self.risk_information = wx.TextCtrl(self.panel, -1, "",(10, 480),(470,145),wx.TE_MULTILINE|wx.TE_READONLY)
+        self.risk_history_title = wx.StaticText(self.panel, -1, "Risk history",(10, 630))
+        self.risk_history = wx.TextCtrl(self.panel, -1, "",(10, 650),(470,105),wx.TE_MULTILINE|wx.TE_READONLY)
+        self.listbox.Bind(wx.EVT_LISTBOX, self.on_click_listbox)
+
+        self.vb.Add(self.listbox, 0)
+        self.nmbox.Add(self.vb, 0)
+        self.nmbox.Add(self.plotter,0)
+        
+    def on_click_listbox(self,event):
+        risklist = risk.risk().risk_analyse(sensorID_dict)
+        select = self.listbox.GetSelection()
+
+        print(risklist[select].sensortype)
+
+        if(risklist[select].sensortype==0):
+            tem=[]
+            count=0
+            t=[self.linet1,self.linet2,self.linet3]
+            tem.append(t[int(risklist[select].place)-1])
+            count+=1
+
+            self.plotter.Clear()
+            gc= plot.PlotGraphics(tem, 'Tem', 'time', 'tem')
+            self.plotter.Draw(gc)
+            self.panel.Update()
+            self.panel.Refresh()
+        elif(risklist[select].sensortype==1):
+            vibration=[]
+            count=0
+            p=[self.linevx1,self.linevx2,self.linevx3]
+            vibration.append(p[int(risklist[select].place)-1])
+            count+=1
+
+            print(vibration)
+            self.plotter.Clear()
+            gc= plot.PlotGraphics(vibration, 'Vibration', 'time', 'vibration')
+            self.plotter.Draw(gc)
+            self.panel.Update()
+            self.panel.Refresh()
+
+
+
+        self.mechine_information.Value = '''Running time: 5 hours
+Sensor id: 1
+'''
+        self.risk_information.Value = risklist[select].tostring()
+        count=-1
+        for i in risklist:
+            if i.riskname==risklist[select].riskname:
+                count+=1
+        self.risk_history.Label="This risk has been happened " +str(count)+" times"
+
 
 
     #get each line for sensor
     def get_lines(self,time = 10000):
         global maxtime
-        self.s0temdata= []
-        for j in sensorID_dict["1"]:
-            if(j.temperature==''):
-                continue
-            if float(time)>=float(j.timestamp):
-                self.s0temdata.append([j.timestamp,j.temperature])
-        if float(j.timestamp)>maxtime:
-            maxtime = float(j.timestamp)
-        for i in range(len(self.s0temdata)):
-            for j in range(i,len(self.s0temdata)):
-                if(self.s0temdata[i][0]>self.s0temdata[j][0]):
-                    a=self.s0temdata[i]
-                    self.s0temdata[i]=self.s0temdata[j]
-                    self.s0temdata[j]=a
-        self.maopao(self.s0temdata)
-        self.linet0= plot.PolyLine(self.s0temdata, colour='red', width=1)
-
         self.s1temdata= []
-        for j in sensorID_dict["2"]:
+        for j in sensorID_dict["1"]:
             if(j.temperature==''):
                 continue
             if float(time)>=float(j.timestamp):
                 self.s1temdata.append([j.timestamp,j.temperature])
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
+        for i in range(len(self.s1temdata)):
+            for j in range(i,len(self.s1temdata)):
+                if(self.s1temdata[i][0]>self.s1temdata[j][0]):
+                    a=self.s1temdata[i]
+                    self.s1temdata[i]=self.s1temdata[j]
+                    self.s1temdata[j]=a
         self.maopao(self.s1temdata)
-        self.linet1= plot.PolyLine(self.s1temdata, colour='black', width=1)
+        self.linet1= plot.PolyLine(self.s1temdata, colour='red', width=1)
 
         self.s2temdata= []
-        for j in sensorID_dict["3"]:
+        for j in sensorID_dict["2"]:
             if(j.temperature==''):
                 continue
             if float(time)>=float(j.timestamp):
@@ -320,163 +427,211 @@ class Dashboard(wx.Frame):
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
         self.maopao(self.s2temdata)
-        self.linet2= plot.PolyLine(self.s2temdata, colour='blue', width=1)
+        self.linet2= plot.PolyLine(self.s2temdata, colour='black', width=1)
 
-        self.s0predata= []
+        self.s3temdata= []
+        for j in sensorID_dict["3"]:
+            if(j.temperature==''):
+                continue
+            if float(time)>=float(j.timestamp):
+                self.s3temdata.append([j.timestamp,j.temperature])
+        if float(j.timestamp)>maxtime:
+            maxtime = float(j.timestamp)
+        self.maopao(self.s3temdata)
+        self.linet3= plot.PolyLine(self.s3temdata, colour='blue', width=1)
+
+        self.s1vibx= []
         for j in sensorID_dict["1"]:
             if float(time)>=float(j.timestamp):
-                self.s0predata.append([j.timestamp,j.vibrationx])
+                self.s1vibx.append([j.timestamp,j.vibrationx])
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
-        self.maopao(self.s0predata)
-        self.linep0= plot.PolyLine(self.s0predata, colour='red', width=1)
+        self.maopao(self.s1vibx)
+        self.linevx1= plot.PolyLine(self.s1vibx, colour='red', width=1)
 
-        self.s1predata= []
+        self.s2vibx= []
         for j in sensorID_dict["2"]:
             if float(time)>=float(j.timestamp):
-                self.s1predata.append([j.timestamp,j.vibrationx])
+                self.s2vibx.append([j.timestamp,j.vibrationx])
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
-        self.maopao(self.s1predata)
-        self.linep1= plot.PolyLine(self.s1predata, colour='black', width=1)
+        self.maopao(self.s2vibx)
+        self.linevx2= plot.PolyLine(self.s2vibx, colour='black', width=1)
 
-        self.s2predata= []
+        self.s3vibx= []
         for j in sensorID_dict["3"]:
             if float(time)>=float(j.timestamp):
-                self.s2predata.append([j.timestamp,j.vibrationx])
+                self.s3vibx.append([j.timestamp,j.vibrationx])
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
-        self.maopao(self.s2predata)
-        self.linep2= plot.PolyLine(self.s2predata, colour='blue', width=1)
+        self.maopao(self.s3vibx)
+        self.linevx3= plot.PolyLine(self.s3vibx, colour='blue', width=1)
 
-        self.s0vibdata= []
+        self.s1viby= []
         for j in sensorID_dict["1"]:
 
             if float(time)>=float(j.timestamp):
-                self.s0vibdata.append([j.timestamp,j.vibrationy])
+                self.s1viby.append([j.timestamp,j.vibrationy])
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
-        self.maopao(self.s0vibdata)
-        self.linev0= plot.PolyLine(self.s0vibdata, colour='red', width=1)
+        self.maopao(self.s1viby)
+        self.linevy0= plot.PolyLine(self.s1viby, colour='red', width=1)
 
-        self.s1vibdata= []
+        self.s2viby= []
         for j in sensorID_dict["2"]:
             if float(time)>=float(j.timestamp):
-                self.s1vibdata.append([j.timestamp,j.vibrationy])
+                self.s2viby.append([j.timestamp,j.vibrationy])
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
-        self.maopao(self.s1vibdata)
-        self.linev1= plot.PolyLine(self.s1vibdata, colour='black', width=1)
+        self.maopao(self.s2viby)
+        self.linevy1= plot.PolyLine(self.s2viby, colour='black', width=1)
 
-        self.s2vibdata= []
+        self.s3viby= []
         for j in sensorID_dict["3"]:
             if float(time)>=float(j.timestamp):
-                self.s2vibdata.append([j.timestamp,j.vibrationy])
+                self.s3viby.append([j.timestamp,j.vibrationy])
         if float(j.timestamp)>maxtime:
             maxtime = float(j.timestamp)
-        self.maopao(self.s2vibdata)
-        self.linev2= plot.PolyLine(self.s2vibdata, colour='blue', width=1)
+        self.maopao(self.s3viby)
+        self.linevy2= plot.PolyLine(self.s3viby, colour='blue', width=1)
+
+        self.s1vibz= []
+        for j in sensorID_dict["1"]:
+
+            if float(time)>=float(j.timestamp):
+                self.s1vibz.append([j.timestamp,j.vibrationz])
+        if float(j.timestamp)>maxtime:
+            maxtime = float(j.timestamp)
+        self.maopao(self.s1vibz)
+        self.linevz0= plot.PolyLine(self.s1vibz, colour='red', width=1)
+
+        self.s2vibz= []
+        for j in sensorID_dict["2"]:
+            if float(time)>=float(j.timestamp):
+                self.s2vibz.append([j.timestamp,j.vibrationz])
+        if float(j.timestamp)>maxtime:
+            maxtime = float(j.timestamp)
+        self.maopao(self.s2vibz)
+        self.linevz1= plot.PolyLine(self.s2vibz, colour='black', width=1)
+
+        self.s3vibz= []
+        for j in sensorID_dict["3"]:
+            if float(time)>=float(j.timestamp):
+                self.s3vibz.append([j.timestamp,j.vibrationz])
+        if float(j.timestamp)>maxtime:
+            maxtime = float(j.timestamp)
+        self.maopao(self.s3vibz)
+        self.linevz2= plot.PolyLine(self.s3vibz, colour='blue', width=1)
 
     #func for checkbox
     def checkevent(self,event):
-        for i in self.temboxlist:
-            print(i.GetValue())
-
-        tem=[]
-        count=0
-        t=[self.linet0,self.linet1,self.linet2]
-        for i in self.temboxlist:
-            #print(i.GetValue())
+        id=-1
+        for i in self.singleboxlist:
             if i.GetValue():
-                tem.append(t[count])
-            count+=1
+                id=i.GetId()
+                break
+        if (id == 0):
+            tem=[]
+            count=0
+            t=[self.linet1,self.linet2,self.linet3]
+            for i in self.checkboxlist:
+                #print(i.GetValue())
+                if i.GetValue():
+                    tem.append(t[count])
+                count+=1
 
-        if(tem!=[]):
-            self.plotter.Clear()
-            gc= plot.PlotGraphics(tem, 'Tem', 'time', 'tem')
-            self.plotter.Draw(gc)
-            self.panel.Update()
-            self.panel.Refresh()
+            if(tem!=[]):
+                self.plotter.Clear()
+                gc= plot.PlotGraphics(tem, 'Tem', 'time', 'tem')
+                self.plotter.Draw(gc)
+                self.panel.Update()
+                self.panel.Refresh()
+        elif (id ==1):
+            vibx=[]
+            count=0
+            p=[self.linevx1,self.linevx2,self.linevx3]
+            for i in self.checkboxlist:
+                #print(i.GetValue())
+                if i.GetValue():
+                    vibx.append(p[count])
+                count+=1
 
-        pre=[]
-        count=0
-        p=[self.linep0,self.linep1,self.linep2]
-        for i in self.vibrationx:
-            #print(i.GetValue())
-            if i.GetValue():
-                pre.append(p[count])
-            count+=1
+            if(vibx!=[]):
+                self.plotter.Clear()
+                gc= plot.PlotGraphics(vibx, 'Vibrationx', 'time', 'vibrationx')
+                self.plotter.Draw(gc)
+                self.panel.Update()
+                self.panel.Refresh()
+        elif(id==2):
+            viby=[]
+            count=0
+            v=[self.linevy0,self.linevy1,self.linevy2]
+            for i in self.checkboxlist:
+                #print(i.GetValue())
+                if i.GetValue():
+                    viby.append(v[count])
+                count+=1
 
-        if(pre!=[]):
-            self.plotter2.Clear()
-            gc= plot.PlotGraphics(pre, 'pre', 'time', 'pre')
-            self.plotter2.Draw(gc)
-            self.panel.Update()
-            self.panel.Refresh()
+            if(viby!=[]):
+                self.plotter.Clear()
+                gc= plot.PlotGraphics(viby, 'Vibrationy', 'time', 'vibrationy')
+                self.plotter.Draw(gc)
+                self.panel.Update()
+                self.panel.Refresh()
 
-        vib=[]
-        count=0
-        v=[self.linev0,self.linev1,self.linev2]
-        for i in self.vibrationy:
-            #print(i.GetValue())
-            if i.GetValue():
-                vib.append(v[count])
-            count+=1
+        elif(id==3):
+            vibz=[]
+            count=0
+            v=[self.linevz0,self.linevz1,self.linevz2]
+            for i in self.checkboxlist:
+                #print(i.GetValue())
+                if i.GetValue():
+                    vibz.append(v[count])
+                count+=1
 
-        if(vib!=[]):
-            self.plotter3.Clear()
-            gc= plot.PlotGraphics(vib, 'vib', 'time', 'vibration')
-            self.plotter3.Draw(gc)
-            self.panel.Update()
-            self.panel.Refresh()
+            if(vibz!=[]):
+                self.plotter.Clear()
+                gc= plot.PlotGraphics(vibz, 'Vibrationz', 'time', 'vibrationz')
+                self.plotter.Draw(gc)
+                self.panel.Update()
+                self.panel.Refresh()
 
         self.Show()
 
     #func for reply model refresh page
     def reply_refresh(self):
+        id=-1
+        for i in self.singleboxlist:
+            if i.GetValue():
+                id=i.GetId()
+                break
+        if (id == 0):
+            box=[self.linet1,self.linet2,self.linet3]
+        elif (id == 1):
+            box=[self.linevx1,self.linevx2,self.linevx3]
+        elif (id == 2):
+            box=[self.linevy0,self.linevy1,self.linevy2]
+        elif (id == 3):
+            box=[self.linevz0,self.linevz1,self.linevz2]
 
-        tem=[]
+        boxlist=[]
         count=0
-        t=[self.linet0,self.linet1,self.linet2]
-        for i in self.temboxlist:
+        
+        for i in self.checkboxlist:
             #print(i.GetValue())
             if i.GetValue():
-                tem.append(t[count])
+                boxlist.append(box[count])
             count+=1
-
         self.plotter.Clear()
-        gc= plot.PlotGraphics(tem, 'Tem', 'time', 'tem')
+        if (id == 0):
+            gc= plot.PlotGraphics(boxlist, 'Tem', 'time', 'tem')
+        elif (id == 1):
+            gc= plot.PlotGraphics(boxlist, 'Virbrationx', 'time', 'Virx')
+        elif (id == 2):
+            gc= plot.PlotGraphics(boxlist, 'Virbrationy', 'time', 'Viry')
+        elif (id == 3):
+            gc= plot.PlotGraphics(boxlist, 'Virbrationz', 'time', 'Virz')
         self.plotter.Draw(gc)
-        self.panel.Update()
-        self.panel.Refresh()
-
-        pre=[]
-        count=0
-        p=[self.linep0,self.linep1,self.linep2]
-        for i in self.vibrationx:
-            #print(i.GetValue())
-            if i.GetValue():
-                pre.append(p[count])
-            count+=1
-
-        self.plotter2.Clear()
-        gc= plot.PlotGraphics(pre, 'pre', 'time', 'pre')
-        self.plotter2.Draw(gc)
-        self.panel.Update()
-        self.panel.Refresh()
-
-        vib=[]
-        count=0
-        v=[self.linev0,self.linev1,self.linev2]
-        for i in self.vibrationy:
-            #print(i.GetValue())
-            if i.GetValue():
-                vib.append(v[count])
-            count+=1
-
-        self.plotter3.Clear()
-        gc= plot.PlotGraphics(vib, 'vib', 'time', 'vibration')
-        self.plotter3.Draw(gc)
         self.panel.Update()
         self.panel.Refresh()
 
@@ -548,7 +703,7 @@ def cauclate(s):
     Datatem=[]
     Datapre=[]
     #Datavib=[]
-    for i in [s.s0temdata,s.s1temdata,s.s2temdata]:
+    for i in [s.s1temdata,s.s2temdata,s.s3temdata]:
         mmax=0
         mmin=100
         sum=0
