@@ -59,86 +59,41 @@ class Dashboard(wx.Frame):
         self.checkboxlist=[]
         self.vibrationx=[]
         self.vibrationy=[]
- 
+        self.set_menu()
+        self.panel = wx.Panel(self)
         self.draw()
+
  
     #draw graph and table for each page
     def draw(self):
-        
-        menuBar = wx.MenuBar()
- 
-        menumenu = wx.Menu()
- 
-        exportimage = wx.Menu()
-        exportmenu=wx.Menu()
 
-        expng = wx.MenuItem(exportimage, id = 122, text = "png file", kind = wx.ITEM_NORMAL)
-        exjpg = wx.MenuItem(exportimage, id = 121, text = "jpg file", kind = wx.ITEM_NORMAL)
-        exportpdf = wx.MenuItem(menumenu, id = 22, text = "pdf file", kind = wx.ITEM_NORMAL)
-        exportimage.AppendItem(exjpg)
-        exportimage.AppendItem(expng)
-
-        exportmenu.AppendMenu(wx.ID_ANY, "Image", exportimage)
-        exportmenu.AppendItem(exportpdf)
-
-        radio1 = wx.MenuItem(menumenu, id = 13, text = "static", kind = wx.ITEM_RADIO)
-        radio2 = wx.MenuItem(menumenu, id = 14, text = "reply", kind = wx.ITEM_RADIO)
-        menumenu.AppendItem(radio1)
-        menumenu.AppendItem(radio2)
- 
-        menumenu.AppendSeparator()
-
-        quit = wx.MenuItem(menumenu, id = wx.ID_EXIT, text = "Quit\tCtrl+Q", kind = wx.ITEM_NORMAL)
-        menumenu.AppendItem(quit)
-
-        menuBar.Append(menumenu, title = 'Menu')
-        menuBar.Append(exportmenu, title = 'Export')
-
-        self.SetMenuBar(menuBar)
-
-        self.Bind(wx.EVT_MENU, self.menuHandler)
-
-
-        self.panel = wx.Panel(self)
         self.panel.SetBackgroundColour("White")  
-        self.plotter = plot.PlotCanvas(self.panel)
-        #self.plotter2 = plot.PlotCanvas(self.panel)
-        #self.plotter3 = plot.PlotCanvas(self.panel)
+        self.plotter = plot.PlotCanvas(self.panel,pos=(0,35))
         self.plotter.SetInitialSize(size=(500, 300))
-        #self.plotter2.SetInitialSize(size=(500, 500))
-        #self.plotter3.SetInitialSize(size=(500, 500))
         
-        self.nmbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.vboxleft = wx.BoxSizer(wx.VERTICAL)
-        self.vboxmid = wx.BoxSizer(wx.HORIZONTAL)
-        self.vboxright = wx.BoxSizer(wx.VERTICAL)
 
-        self.hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-        #self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-        #self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 
-        boxtem=wx.RadioButton(self.panel,0,"temperature sensor",pos=(30,50),size=(250,20))
+        boxtem=wx.RadioButton(self.panel,0,"temperature sensor",pos=(15,0),size=(150,20))
         boxtem.SetValue(True)
         self.singleboxlist.append(boxtem)
         boxtem.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
-        self.hbox.Add(boxtem,0,wx.LEFT,border=10)
-        boxvx=wx.RadioButton(self.panel,1,"Virbration X",pos=(60,50),size=(250,20))
+
+        boxvx=wx.RadioButton(self.panel,1,"Vibration X",pos=(165,0),size=(110,20))
         self.singleboxlist.append(boxvx)
         boxvx.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
-        self.hbox.Add(boxvx)
-        boxvy=wx.RadioButton(self.panel,2,"Virbration Y",pos=(90,50),size=(250,20))
+
+        boxvy=wx.RadioButton(self.panel,2,"Vibration Y",pos=(285,0),size=(110,20))
         self.singleboxlist.append(boxvy)
         boxvy.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
-        self.hbox.Add(boxvy)
-        boxvz=wx.RadioButton(self.panel,3,"Virbration Z",pos=(120,50),size=(250,20))
+
+        boxvz=wx.RadioButton(self.panel,3,"Vibration Z",pos=(395,0),size=(110,20))
         self.singleboxlist.append(boxvz)
         boxvz.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
-        self.hbox.Add(boxvz)
+
             
 
         for i in range(0,len(sensorID_dict)):
-            boxtem=wx.CheckBox(self.panel,i,"",pos=(50*i,50),size=(300,15))
+            boxtem=wx.CheckBox(self.panel,i,"",pos=(15+175*i,20),size=(175,15))
             if(i==0):
                 boxtem.SetLabel("sensor1(redline)")
             elif(i==1):
@@ -148,55 +103,28 @@ class Dashboard(wx.Frame):
 
             boxtem.SetValue(True)
             self.Bind(wx.EVT_CHECKBOX,self.checkevent)
-            #self.Bind(wx.EVT_CHECKBOX,self.checkevent_pre,boxpre)
             self.checkboxlist.append(boxtem)
-            #self.vibrationx.append(boxpre)
-            #self.vibboxlist.append(boxvib)
 
-            self.hbox2.Add(boxtem,0,wx.LEFT,border=10)
-            #self.hbox2.Add(boxpre,0,wx.LEFT,border=10)
-            #self.hbox3.Add(boxvib,0,wx.LEFT,border=10)
-
-        self.vboxleft.Add(self.hbox,0)
-        self.vboxleft.Add(self.hbox2,0)
-        self.vboxmid.Add(self.plotter, 0)
-        #self.vboxmid.Add(self.hbox2, 0)
-        #self.vboxmid.Add(self.plotter2, 0)
-        #self.vboxright.Add(self.hbox3, 0)
-        #self.vboxright.Add(self.plotter3, 0)
 
 
         self.temtable = table.GridTableBase()
-        #self.pretable = table.GridTableBase()
-        #self.vibtable = table.GridTableBase()
-        self.temgrid = wx.grid.Grid(self.panel,-1,pos=(15,550),size=(500,138))
+        self.temgrid = wx.grid.Grid(self.panel,-1,pos=(500,40),size=(500,138))
         self.temgrid.SetTable(self.temtable)
         
-        #self.pregrid = wx.grid.Grid(self.panel,-1,pos=(15+500,550),size=(500,150))
-        #self.pregrid.SetTable(self.pretable)
-        #self.vibgrid = wx.grid.Grid(self.panel,-1,pos=(15+1000,550),size=(500,150))
-        #self.vibgrid.SetTable(self.vibtable)
         cauclate(self)
         
-
+        
         self.vb = wx.BoxSizer(wx.VERTICAL)
         risklist = risk.risk().risk_analyse(sensorID_dict)
         label = ""
         for i in risklist:
             label+=i.tostring()+"\n"
         if(len(risklist)>0):
-            self.word = wx.StaticText(parent=self.panel, id=10, label=risklist[0].tostring())
+            self.word = wx.StaticText(parent=self.panel,pos=(500,200), label=risklist[0].tostring())
         else:
-            self.word = wx.StaticText(parent=self.panel, id=10, label="")
+            self.word = wx.StaticText(parent=self.panel,pos=(500,200), label="")
         
 
-        self.vb.Add(self.temgrid, 0)
-        self.vb.Add(self.word, 0)
-        self.vboxmid.Add(self.vb, 0)
-
-        
-
-        
         self.bmaps=wx.Bitmap('C:/Users/MSI-NB/Desktop/2.png',wx.BITMAP_TYPE_ANY)
         self.image=wx.StaticBitmap(self.panel,-1,self.bmaps,pos=(0,340))
         self.s1button = wx.Button(self.image, label='S1',pos=(280, 385),size=(35,35))
@@ -205,59 +133,36 @@ class Dashboard(wx.Frame):
         self.s2button.Bind(wx.EVT_BUTTON, self.on_click_s1)
         self.s3button = wx.Button(self.image, label='S3',pos=(635, 60),size=(35,35))
         self.s3button.Bind(wx.EVT_BUTTON, self.on_click_s1)
-        
-        
 
-        self.vboxleft.Add(self.vboxmid,0)
-        self.nmbox.Add(self.vboxleft, 0)
-
-
-
-        #self.nmbox.Add(self.vboxright, 0)
- 
         
         tem=[]
-        #pre=[]
-        #vib=[]
         count=0
         t=[self.linet1,self.linet2,self.linet3]
-        #p=[self.linep0,self.linep1,self.linep2]
-        #v=[self.linev0,self.linev1,self.linev2]
         for i in self.checkboxlist:
             if i.GetValue():
                 tem.append(t[count])
             count+=1
         count=0
-        
-        '''
-        for i in [self.linep0,self.linep1,self.linep2]:
-            if self.preboxlist[count]:
-                pre.append(i)
-            count+=1
-        '''
 
-        #count=0
-        #for i in [self.linev0,self.linev1,self.linev2]:
-        #    if self.vibboxlist[count]:
-        #        vib.append(i)
-        #    count+=1
-        
-        gc1= plot.PlotGraphics(tem, 'Tem', 'time', 'tem')
-        #gc2= plot.PlotGraphics(pre, 'Pre', 'time', 'pressure')
-        #gc3= plot.PlotGraphics(vib, 'Vib', 'time', 'vibration')
+        gc1= plot.PlotGraphics(tem, 'Temperature by time line', 'time', 'tem')
         self.plotter.Draw(gc1)
-        #self.plotter2.Draw(gc2)
-        #self.plotter3.Draw(gc3)
+
 
         self.sensor_risk_button("1",risklist)
         self.sensor_risk_button("2",risklist)
         self.sensor_risk_button("3",risklist)
 
-        self.panel.SetSizer(self.nmbox)
         self.Show()
         toastone = wx.MessageDialog(None, "The machine is seriously out of order and may break down at any time."+"\n"+"Please check the Risk module for more details",caption="Danger risk",style = wx.ICON_WARNING)
         if(toastone.ShowModal() == wx.ID_YES): 
             toastone.Destroy() 
+
+
+    def getback(self, event):
+        self.panel.DestroyChildren()
+        self.draw()
+
+
 
     #func for sensor risk information button
     def sensor_risk_button(self,sensorid,a):
@@ -267,7 +172,8 @@ class Dashboard(wx.Frame):
         
 
         for i in a:
-            print(i.tostring())
+            print("sensor_risk_button report")
+            print(i.tostring()+"\n")
             print(sensorlevel)
             if i.place!=sensorid:
                 continue
@@ -316,24 +222,18 @@ class Dashboard(wx.Frame):
 
         self.plotter = plot.PlotCanvas(self.panel)
         self.plotter.SetInitialSize(size=(500, 300))
-        self.nmbox = wx.BoxSizer(wx.HORIZONTAL)
         
 
         tem=[self.linet1]
-        #pre=[]
-        #vib=[]
         count=0
         t=[self.linet1,self.linet2,self.linet3]
         
         gc1= plot.PlotGraphics(tem, 'Tem in risk', 'time', 'tem')
-        #gc2= plot.PlotGraphics(pre, 'Pre', 'time', 'pressure')
-        #gc3= plot.PlotGraphics(vib, 'Vib', 'time', 'vibration')
         self.plotter.Draw(gc1)
         
-        self.listbox = wx.ListBox(self.panel, pos=(500,0), size=(430,750), name="listBox",style=wx.LB_ALWAYS_SB)
+        self.listbox = wx.ListBox(self.panel, pos=(500,0), size=(430,650), name="listBox",style=wx.LB_ALWAYS_SB)
         
 
-        self.vb = wx.BoxSizer(wx.VERTICAL)
         risklist = risk.risk().risk_analyse(sensorID_dict)
         font1 = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, 'Consolas')
         self.listbox.SetFont(font1)
@@ -348,9 +248,9 @@ class Dashboard(wx.Frame):
         self.risk_history = wx.TextCtrl(self.panel, -1, "",(10, 650),(470,105),wx.TE_MULTILINE|wx.TE_READONLY)
         self.listbox.Bind(wx.EVT_LISTBOX, self.on_click_listbox)
 
-        self.vb.Add(self.listbox, 0)
-        self.nmbox.Add(self.vb, 0)
-        self.nmbox.Add(self.plotter,0)
+        self.backbutton = wx.Button(self.panel, label='Back to the main page',pos=(500, 660),size=(430,80))
+        self.backbutton.Bind(wx.EVT_BUTTON, self.getback)
+
         
     def on_click_listbox(self,event):
         risklist = risk.risk().risk_analyse(sensorID_dict)
@@ -366,7 +266,7 @@ class Dashboard(wx.Frame):
             count+=1
 
             self.plotter.Clear()
-            gc= plot.PlotGraphics(tem, 'Tem', 'time', 'tem')
+            gc= plot.PlotGraphics(tem, 'Temperature by time line', 'time', 'tem')
             self.plotter.Draw(gc)
             self.panel.Update()
             self.panel.Refresh()
@@ -379,7 +279,7 @@ class Dashboard(wx.Frame):
 
             print(vibration)
             self.plotter.Clear()
-            gc= plot.PlotGraphics(vibration, 'Vibration', 'time', 'vibration')
+            gc= plot.PlotGraphics(vibration, 'Vibration by time line', 'time', 'vibration')
             self.plotter.Draw(gc)
             self.panel.Update()
             self.panel.Refresh()
@@ -558,7 +458,7 @@ Sensor id: 1
 
             if(vibx!=[]):
                 self.plotter.Clear()
-                gc= plot.PlotGraphics(vibx, 'Vibrationx', 'time', 'vibrationx')
+                gc= plot.PlotGraphics(vibx, 'Vibrationx by time line', 'time', 'vibrationx')
                 self.plotter.Draw(gc)
                 self.panel.Update()
                 self.panel.Refresh()
@@ -574,7 +474,7 @@ Sensor id: 1
 
             if(viby!=[]):
                 self.plotter.Clear()
-                gc= plot.PlotGraphics(viby, 'Vibrationy', 'time', 'vibrationy')
+                gc= plot.PlotGraphics(viby, 'Vibrationy by time line', 'time', 'vibrationy')
                 self.plotter.Draw(gc)
                 self.panel.Update()
                 self.panel.Refresh()
@@ -591,7 +491,7 @@ Sensor id: 1
 
             if(vibz!=[]):
                 self.plotter.Clear()
-                gc= plot.PlotGraphics(vibz, 'Vibrationz', 'time', 'vibrationz')
+                gc= plot.PlotGraphics(vibz, 'Vibrationz by time line', 'time', 'vibrationz')
                 self.plotter.Draw(gc)
                 self.panel.Update()
                 self.panel.Refresh()
@@ -626,11 +526,11 @@ Sensor id: 1
         if (id == 0):
             gc= plot.PlotGraphics(boxlist, 'Tem', 'time', 'tem')
         elif (id == 1):
-            gc= plot.PlotGraphics(boxlist, 'Virbrationx', 'time', 'Virx')
+            gc= plot.PlotGraphics(boxlist, 'Vibrationx by time line', 'time', 'Vibx')
         elif (id == 2):
-            gc= plot.PlotGraphics(boxlist, 'Virbrationy', 'time', 'Viry')
+            gc= plot.PlotGraphics(boxlist, 'Vibrationy by time line', 'time', 'Viby')
         elif (id == 3):
-            gc= plot.PlotGraphics(boxlist, 'Virbrationz', 'time', 'Virz')
+            gc= plot.PlotGraphics(boxlist, 'Vibrationz by time line', 'time', 'Vibz')
         self.plotter.Draw(gc)
         self.panel.Update()
         self.panel.Refresh()
@@ -697,6 +597,39 @@ Sensor id: 1
                     a=ll[i]
                     ll[i]=ll[j]
                     ll[j]=a
+    def set_menu(self):
+        menuBar = wx.MenuBar()
+        
+        menumenu = wx.Menu()
+        
+        exportimage = wx.Menu()
+        exportmenu=wx.Menu()
+        
+        expng = wx.MenuItem(exportimage, id = 122, text = "png file", kind = wx.ITEM_NORMAL)
+        exjpg = wx.MenuItem(exportimage, id = 121, text = "jpg file", kind = wx.ITEM_NORMAL)
+        exportpdf = wx.MenuItem(menumenu, id = 22, text = "pdf file", kind = wx.ITEM_NORMAL)
+        exportimage.AppendItem(exjpg)
+        exportimage.AppendItem(expng)
+        
+        exportmenu.AppendMenu(wx.ID_ANY, "Image", exportimage)
+        exportmenu.AppendItem(exportpdf)
+        
+        radio1 = wx.MenuItem(menumenu, id = 13, text = "static", kind = wx.ITEM_RADIO)
+        radio2 = wx.MenuItem(menumenu, id = 14, text = "reply", kind = wx.ITEM_RADIO)
+        menumenu.AppendItem(radio1)
+        menumenu.AppendItem(radio2)
+        
+        menumenu.AppendSeparator()
+        
+        quit = wx.MenuItem(menumenu, id = wx.ID_EXIT, text = "Quit\tCtrl+Q", kind = wx.ITEM_NORMAL)
+        menumenu.AppendItem(quit)
+        
+        menuBar.Append(menumenu, title = 'Menu')
+        menuBar.Append(exportmenu, title = 'Export')
+        
+        self.SetMenuBar(menuBar)
+        
+        self.Bind(wx.EVT_MENU, self.menuHandler)
 
 #get analise table
 def cauclate(s):
@@ -725,24 +658,11 @@ def cauclate(s):
 
     
 
-    #px=max(float(Datapre[0][0]),float(Datapre[1][0]),float(Datapre[2][0]))
     tx=max(float(Datatem[0][0]),float(Datatem[1][0]),float(Datatem[2][0]))
-    #vx=max(float(Datavib[0][0]),float(Datavib[1][0]),float(Datavib[2][0]))
-    #pa=(float(Datapre[0][1])+float(Datapre[1][1])+float(Datapre[2][1]))/3
     ta=(float(Datatem[0][1])+float(Datatem[1][1])+float(Datatem[2][1]))/3
-    #va=(float(Datavib[0][1])+float(Datavib[1][1])+float(Datavib[2][1]))/3
-    #pn=min(float(Datapre[0][2]),float(Datapre[1][2]),float(Datapre[2][2]))
     tn=min(float(Datatem[0][2]),float(Datatem[1][2]),float(Datatem[2][2]))
-    #vn=min(float(Datavib[0][2]),float(Datavib[1][2]),float(Datavib[2][2]))
-    #pd=max(float(Datapre[0][4]),float(Datapre[1][4]),float(Datapre[2][4]))
     td=max(float(Datatem[0][4]),float(Datatem[1][4]),float(Datatem[2][4]))
-    #vd=max(float(Datavib[0][4]),float(Datavib[1][4]),float(Datavib[2][4]))
-    #Datapre.append([px,float('%.2f' % (pa)),pn,'N/A',pd])
     Datatem.append([tx,float('%.2f' % (ta)),tn,'N/A',td])
-    #Datavib.append([vx,float('%.2f' % (va)),vn,'N/A',vd])
-    
-    #s.pretable._data=Datapre
-    #s.vibtable._data=Datavib
 
     Datatemzhuan=[]
     print(Datatem)
@@ -770,7 +690,6 @@ def get_variance(list,avg):
 def main(sourece="sensor_data.csv"):
     global sensorID_dict
     read_csv(sourece)
-    #print_sensorID_dict()
     app = wx.App()
     Dashboard(None,sensorID_dict)
     app.MainLoop()

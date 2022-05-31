@@ -22,7 +22,7 @@ class risk:
     solution=""
     sensortype=0
 
-    def __init__(self,risklevel="",place="",riskname="",influence="",description="",solution="",sensortype=0):
+    def __init__(self,risklevel="",place="",riskname="",influence="",description="",solution="",sensortype=0,time=""):
         self.risklevel = risklevel
         self.place=place
         self.riskname=riskname
@@ -30,6 +30,7 @@ class risk:
         self.influence=influence
         self.solution=solution
         self.sensortype=sensortype
+        self.time=time
 
     def tostring(self):
         return("Risklevel:"+self.risklevel+"\n"+"Place:"+self.place+"\n"+"Riskname:"+self.riskname+"\n"+"Description:"+self.description+"\n"+"Influence:"+self.influence+"\n"+"Solution:"+self.solution+"\n"+"Time:"+self.time)
@@ -72,9 +73,6 @@ class risk:
                         li.append([j,33])
                     if float(j.temperature)>=s3t:
                         li.append([j,34])
-        print("List print")
-        for i in li:
-            print(i[0])
         return li
 
     @staticmethod
@@ -112,11 +110,45 @@ class risk:
     @staticmethod
     def overload(li=""):
         count = 0
+        timelist=[]
         for i in li:
             if(i[1]==14):
                 count+=1
-        print("overload:"+str(count))
-        return count
+                timelist.append(i[0].timestamp)
+
+        if(count!=0):
+            if(count<3):
+                return (risk(
+                    risklevel="blue",
+                    place="1",
+                    riskname="Overload",
+                    influence="Won't cause serious result",
+                    description="Just overload, focus on the mechine and make sure it won't too hot",
+                    solution="Just overload, focus on the mechine and make sure it won't too hot",
+                    time=str(timelist)))
+            elif(count<5):
+                return (risk(
+                    risklevel="yellow",
+                    place="1",
+                    riskname="Overload",
+                    influence="Overload for a long time may cause serious damage to the machine",
+                    description="Multiple overloads indicate that the machine is overused and needs to be allocated properly",
+                    solution="Reduce concentrated use to prevent overheating",
+                    time=str(timelist)))
+            else:
+                return (risk(
+                    risklevel="red",
+                    place="1",
+                    riskname="Motor overload",
+                    influence="Frequent overloads can cause permanent damage to the motor",
+                    description="Long time overload makes the motor temperature always too high, at a dangerous level",
+                    solution="Suspend use and perform maintenance",
+                    time=str(timelist)))
+
+        return None
+        
+
+
 
     @staticmethod
     def unstable_track(li=""):
@@ -137,7 +169,8 @@ class risk:
                 riskname="Belt wear",
                 influence="Won't cause serious result",
                 description="The belt will broke, but it can still work a few days",
-                solution="Change the belt later, just focus on it now"))
+                solution="Change the belt later, just focus on it now",
+                time=li[0].time))
         if(risk().belt_fall_off(li)):
             returnrisk.append(risk(
                 risklevel="red",
@@ -197,31 +230,7 @@ class risk:
                 description="The wheel has been moving too much, machine should be stopped immediately!",
                 solution="Machine need to be stopped to fix"))
         c = risk().overload(li)
-        if(c!=0):
-            if(c<3):
-                returnrisk.append(risk(
-                    risklevel="blue",
-                    place="1",
-                    riskname="Overload",
-                    influence="Won't cause serious result",
-                    description="Just overload, focus on the mechine and make sure it won't too hot",
-                    solution="Just overload, focus on the mechine and make sure it won't too hot"))
-            elif(c<5):
-                returnrisk.append(risk(
-                    risklevel="yellow",
-                    place="1",
-                    riskname="Overload",
-                    influence="Overload for a long time may cause serious damage to the machine",
-                    description="Multiple overloads indicate that the machine is overused and needs to be allocated properly",
-                    solution="Reduce concentrated use to prevent overheating"))
-            else:
-                returnrisk.append(risk(
-                    risklevel="red",
-                    place="1",
-                    riskname="Motor overload",
-                    influence="Frequent overloads can cause permanent damage to the motor",
-                    description="Long time overload makes the motor temperature always too high, at a dangerous level",
-                    solution="Suspend use and perform maintenance"))
+        returnrisk.append(c)
         if(risk().unstable_track(li)):
             returnrisk.append(risk(
                 risklevel="blue",
