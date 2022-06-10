@@ -230,7 +230,8 @@ class risk:
                 description="The wheel has been moving too much, machine should be stopped immediately!",
                 solution="Machine need to be stopped to fix"))
         c = risk().overload(li)
-        returnrisk.append(c)
+        if(c!=None):
+            returnrisk.append(c)
         if(risk().unstable_track(li)):
             returnrisk.append(risk(
                 risklevel="blue",
@@ -247,6 +248,8 @@ class risk:
                 influence="This risk will be danger soon",
                 description="Cargo fixed loose, it is danger for passengers",
                 solution="Fix it but this risk is not so hurry"))
-
+        for i in returnrisk:
+            print(i.tostring())
+            print("\n")
         return returnrisk
         

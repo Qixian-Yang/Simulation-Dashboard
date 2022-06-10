@@ -21,7 +21,6 @@ class Loginwindow(wx.Frame):
 
     #when user click start by local, just close the window and run dashboard.
     def OnclickLoacl(self, ever):
-        dashboard.main()
         try:
             self.Close()
             dashboard.main()
@@ -61,7 +60,7 @@ class Loginwindow(wx.Frame):
 
     #when user press exit, just exit program
     def OnclickExit(self, event):
-        exit(0)
+        self.Close()
 
 
 if __name__ == '__main__':

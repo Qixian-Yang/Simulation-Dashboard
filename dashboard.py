@@ -5,7 +5,7 @@ import time
 from wx.lib.embeddedimage import PyEmbeddedImage
 import risk
 
-sensorID_dict={}
+sensorID_dict={'1':[],'2':[],'3':[]}
 maxtime=0
 point=0
 
@@ -14,7 +14,7 @@ Risk_on_s2=''
 Risk_on_s3=''
 
 #open csv file and get data
-def read_csv(source = "sensor_data.csv"):
+def read_csv(source = "abc.csv"):
     global sensorID_dict
     with open(source) as file:
          for line in  file:
@@ -23,14 +23,14 @@ def read_csv(source = "sensor_data.csv"):
              #split each line
              line=line.split(',' )
              #dont write in line1
-             if line[0]=="Timestamp":
+             if line[0]=="Entity Count":
                  continue
              #if dont fine this sensor id in dictionary,create a new one
-             if sensorID_dict.get(line[2])==None:
-                 sensorID_dict[line[2]]=[data.data(line[0],line[1],line[2],line[3],line[4],line[5],line[6])]
-             else:
-                 sensorID_dict[line[2]].append(data.data(line[0],line[1],line[2],line[3],line[4],line[5],line[6]))
-   
+             print(line)
+             sensorID_dict['1'].append(data.data(line[0],line[1],'1',line[3],line[4],line[5],line[6]))
+             sensorID_dict['2'].append(data.data(line[0],line[1],'2',line[7],line[8],line[9],line[10]))
+             sensorID_dict['3'].append(data.data(line[0],line[1],'3',line[11],line[12],line[13],line[14]))
+                 
 #this func is for test
 def print_sensorID_dict():
     global sensorID_dict
@@ -67,12 +67,12 @@ class Dashboard(wx.Frame):
     #draw graph and table for each page
     def draw(self):
 
-        self.panel.SetBackgroundColour("White")  
+        self.panel.SetBackgroundColour((184,240,250))  
         self.plotter = plot.PlotCanvas(self.panel,pos=(0,35))
         self.plotter.SetInitialSize(size=(500, 300))
         
 
-
+        #select box
         boxtem=wx.RadioButton(self.panel,0,"temperature sensor",pos=(15,0),size=(150,20))
         boxtem.SetValue(True)
         self.singleboxlist.append(boxtem)
@@ -91,7 +91,11 @@ class Dashboard(wx.Frame):
         boxvz.Bind(wx.EVT_RADIOBUTTON, self.checkevent)
 
             
-
+        #table part
+        self.data_overview = wx.StaticText(parent=self.panel,pos=(650,5), label="Data overview")
+        Font = self.data_overview.GetFont()
+        Font.PointSize=15
+        self.data_overview.SetFont(Font)
         for i in range(0,len(sensorID_dict)):
             boxtem=wx.CheckBox(self.panel,i,"",pos=(15+175*i,20),size=(175,15))
             if(i==0):
@@ -104,35 +108,32 @@ class Dashboard(wx.Frame):
             boxtem.SetValue(True)
             self.Bind(wx.EVT_CHECKBOX,self.checkevent)
             self.checkboxlist.append(boxtem)
-
-
-
         self.temtable = table.GridTableBase()
         self.temgrid = wx.grid.Grid(self.panel,-1,pos=(500,40),size=(500,138))
-        self.temgrid.SetTable(self.temtable)
-        
+        self.temgrid.SetTable(self.temtable) 
         cauclate(self)
         
-        
+        #risk_result
         self.vb = wx.BoxSizer(wx.VERTICAL)
         risklist = risk.risk().risk_analyse(sensorID_dict)
         label = ""
-        for i in risklist:
-            label+=i.tostring()+"\n"
+        if(risklist!=None):
+            for i in risklist:
+                label+=i.tostring()+"\n"
         if(len(risklist)>0):
-            self.word = wx.StaticText(parent=self.panel,pos=(500,200), label=risklist[0].tostring())
+            self.risk_result = wx.TextCtrl(self.panel, -1, risklist[0].tostring(),pos=(510,190),size = (410,140),style=wx.TE_MULTILINE|wx.TE_READONLY)
         else:
             self.word = wx.StaticText(parent=self.panel,pos=(500,200), label="")
         
-
+        #risk part
         self.bmaps=wx.Bitmap('C:/Users/MSI-NB/Desktop/2.png',wx.BITMAP_TYPE_ANY)
         self.image=wx.StaticBitmap(self.panel,-1,self.bmaps,pos=(0,340))
         self.s1button = wx.Button(self.image, label='S1',pos=(280, 385),size=(35,35))
         self.s1button.Bind(wx.EVT_BUTTON, self.on_click_s1)
         self.s2button = wx.Button(self.image, label='S2',pos=(315, 5),size=(35,35))
-        self.s2button.Bind(wx.EVT_BUTTON, self.on_click_s1)
+        self.s2button.Bind(wx.EVT_BUTTON, self.on_click_s2)
         self.s3button = wx.Button(self.image, label='S3',pos=(635, 60),size=(35,35))
-        self.s3button.Bind(wx.EVT_BUTTON, self.on_click_s1)
+        self.s3button.Bind(wx.EVT_BUTTON, self.on_click_s3)
 
         
         tem=[]
@@ -154,12 +155,19 @@ class Dashboard(wx.Frame):
 
         self.Show()
         toastone = wx.MessageDialog(None, "The machine is seriously out of order and may break down at any time."+"\n"+"Please check the Risk module for more details",caption="Danger risk",style = wx.ICON_WARNING)
-        if(toastone.ShowModal() == wx.ID_YES): 
-            toastone.Destroy() 
+        if(toastone.ShowModal() == wx.ID_YES):
+            toastone.Destroy()
+
+        self.panel.Update()
+        self.panel.Refresh()
 
 
     def getback(self, event):
         self.panel.DestroyChildren()
+        self.singleboxlist=[]
+        self.checkboxlist=[]
+        self.vibrationx=[]
+        self.vibrationy=[]
         self.draw()
 
 
@@ -169,12 +177,7 @@ class Dashboard(wx.Frame):
         sensorcount = 0
         sensorlevel = ""
         sensorriskname="No risk"
-        
-
         for i in a:
-            print("sensor_risk_button report")
-            print(i.tostring()+"\n")
-            print(sensorlevel)
             if i.place!=sensorid:
                 continue
             elif i.risklevel=="red":
@@ -189,14 +192,15 @@ class Dashboard(wx.Frame):
                 sensorlevel="blue"
                 sensorcount+=1
                 sensorriskname = i.riskname
-            print(sensorlevel)
-            print("\n")
         if(sensorid=="1"):
-            rev = wx.TextCtrl(self.panel, -1, sensorriskname,(325, 725),(140,36))
+            print("edit on 1")
+            rev = wx.StaticText(self.panel, -1, sensorriskname,(325, 725))
         elif(sensorid=="2"):
-            rev = wx.StaticText(self.panel, -1, "Badly worn in driving wheels",(360, 345))
-        else:
-            rev = wx.StaticText(self.panel, -1, "No risk",(680, 400))
+            print("edit on 2")
+            rev = wx.StaticText(self.panel, -1, sensorriskname,(360, 345))
+        elif(sensorid=="3"):
+            print("edit on 3")
+            rev = wx.StaticText(self.panel, -1, sensorriskname,(680, 400))
         Font = rev.GetFont()
         Font.PointSize=20
         rev.SetFont(Font)
@@ -213,15 +217,21 @@ class Dashboard(wx.Frame):
             rev.SetForegroundColour('black')
             rev.SetBackgroundColour('white')
         #rev.SetModified(True)
-        
+        print("\n")
+
+    def on_click_s1(self,event):
+        self.on_click_s("1")
+    def on_click_s2(self,event):
+        self.on_click_s("2")
+    def on_click_s3(self,event):
+        self.on_click_s("3")
 
        
-    def on_click_s1(self,event):
-        print("on_click_s1")
+    def on_click_s(self,snum):
         self.panel.DestroyChildren()
 
         self.plotter = plot.PlotCanvas(self.panel)
-        self.plotter.SetInitialSize(size=(500, 300))
+        self.plotter.SetInitialSize(size=(495, 300))
         
 
         tem=[self.linet1]
@@ -231,14 +241,18 @@ class Dashboard(wx.Frame):
         gc1= plot.PlotGraphics(tem, 'Tem in risk', 'time', 'tem')
         self.plotter.Draw(gc1)
         
-        self.listbox = wx.ListBox(self.panel, pos=(500,0), size=(430,650), name="listBox",style=wx.LB_ALWAYS_SB)
+        self.risk_title = wx.StaticText(self.panel, -1, "Risk list of sensor"+snum,(570, 20))
+        font1 = wx.Font(20, wx.MODERN, wx.NORMAL, wx.NORMAL, False, 'Consolas')
+        self.risk_title.SetFont(font1)
+        self.listbox = wx.ListBox(self.panel, pos=(500,70), size=(430,580), name="listBox",style=wx.LB_ALWAYS_SB)
         
 
         risklist = risk.risk().risk_analyse(sensorID_dict)
         font1 = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, 'Consolas')
         self.listbox.SetFont(font1)
         for i in risklist:
-            self.listbox.AppendItems('''Risklevel:'''+i.risklevel+'''  Riskname:'''+i.riskname)
+            if(i.place==snum):
+                self.listbox.AppendItems('''Risklevel:'''+i.risklevel+'''  Riskname:'''+i.riskname)
 
         self.mechine_information_title = wx.StaticText(self.panel, -1, "Mechine information",(10, 310))
         self.mechine_information = wx.TextCtrl(self.panel, -1, "",(10, 330),(470,125),wx.TE_MULTILINE|wx.TE_READONLY)
@@ -442,7 +456,7 @@ Sensor id: 1
 
             if(tem!=[]):
                 self.plotter.Clear()
-                gc= plot.PlotGraphics(tem, 'Tem', 'time', 'tem')
+                gc= plot.PlotGraphics(tem, 'Temperature by time line', 'time', 'tem')
                 self.plotter.Draw(gc)
                 self.panel.Update()
                 self.panel.Refresh()
@@ -687,7 +701,7 @@ def get_variance(list,avg):
     else:
         return 0
 
-def main(sourece="sensor_data.csv"):
+def main(sourece="abc.csv"):
     global sensorID_dict
     read_csv(sourece)
     app = wx.App()
